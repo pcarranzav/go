@@ -16,7 +16,7 @@ void runtime·setitimer(int32, Itimerval*, Itimerval*);
 
 enum {
 	SS_DISABLE = 2,
-	NSIG = 64,
+	NSIG = 65,
 	SI_USER = 0,
 	SIG_SETMASK = 2,
 	RLIMIT_AS = 9,
