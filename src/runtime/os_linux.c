@@ -298,7 +298,8 @@ runtime·setsig(int32 i, GoSighandler *fn, bool restart)
 	if(fn == runtime·sighandler)
 		fn = (void*)runtime·sigtramp;
 	sa.sa_handler = fn;
-	runtime·rt_sigaction(i, &sa, nil, sizeof(sa.sa_mask));
+	if(runtime·rt_sigaction(i, &sa, nil, sizeof(sa.sa_mask)) != 0)
+		runtime·throw("rt_sigaction failure");
 }
 
 GoSighandler*
@@ -307,7 +308,8 @@ runtime·getsig(int32 i)
 	SigactionT sa;
 
 	runtime·memclr((byte*)&sa, sizeof sa);
-	runtime·rt_sigaction(i, nil, &sa, sizeof(sa.sa_mask));
+	if(runtime·rt_sigaction(i, nil, &sa, sizeof(sa.sa_mask)) != 0)
+		runtime·throw("rt_sigaction read failure");
 	if((void*)sa.sa_handler == runtime·sigtramp)
 		return runtime·sighandler;
 	return (void*)sa.sa_handler;
