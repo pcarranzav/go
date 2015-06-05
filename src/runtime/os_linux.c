@@ -8,7 +8,6 @@
 #include "signal_unix.h"
 #include "stack.h"
 #include "textflag.h"
-#include <stdio.h>
 
 extern SigTab runtime·sigtab[];
 
@@ -299,9 +298,7 @@ runtime·setsig(int32 i, GoSighandler *fn, bool restart)
 	if(fn == runtime·sighandler)
 		fn = (void*)runtime·sigtramp;
 	sa.sa_handler = fn;
-	if(runtime·rt_sigaction(i, &sa, nil, sizeof(sa.sa_mask)) != 0)
-		printf("rt_sigaction failure");
-		//runtime·throw("rt_sigaction failure");
+	runtime·rt_sigaction(i, &sa, nil, sizeof(sa.sa_mask));
 }
 
 GoSighandler*
@@ -310,8 +307,7 @@ runtime·getsig(int32 i)
 	SigactionT sa;
 
 	runtime·memclr((byte*)&sa, sizeof sa);
-	if(runtime·rt_sigaction(i, nil, &sa, sizeof(sa.sa_mask)) != 0)
-		runtime·throw("rt_sigaction read failure");
+	runtime·rt_sigaction(i, nil, &sa, sizeof(sa.sa_mask));
 	if((void*)sa.sa_handler == runtime·sigtramp)
 		return runtime·sighandler;
 	return (void*)sa.sa_handler;
